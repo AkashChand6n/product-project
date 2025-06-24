@@ -6,13 +6,12 @@ env:
     ECR_ACCOUNT_ID: 715841362372
     BACKEND_IMAGE_NAME: product-backend
     SONAR_HOST_URL: "http://54.197.7.225"
-    SONAR_TOKEN: "sqp_1287d53b6904bd1c8fcc3a4251570374b0d3fee2"  # Hardcoded SonarQube token
+    SONAR_TOKEN: "sqp_1287d53b6904bd1c8fcc3a4251570374b0d3fee2"
 
 phases:
   install:
     runtime-versions:
-      dotnet: 8.0
-      docker: 20
+      dotnet: 8.0  # ✅ Only declare dotnet
     commands:
       - echo "Starting install phase..."
       - apt-get update -y && apt-get install -y unzip wget jq
