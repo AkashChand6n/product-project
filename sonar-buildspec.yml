@@ -1,0 +1,64 @@
+version: 0.2
+
+env:
+  variables:
+    AWS_DEFAULT_REGION: us-east-1
+    ECR_ACCOUNT_ID: 715841362372
+    BACKEND_IMAGE_NAME: product-backend
+    SONAR_HOST_URL: "http://54.197.7.225"
+    SONAR_TOKEN: "sqp_1287d53b6904bd1c8fcc3a4251570374b0d3fee2"  # Hardcoded SonarQube token
+
+phases:
+  install:
+    runtime-versions:
+      dotnet: 8.0
+      docker: 20
+    commands:
+      - echo "Starting install phase..."
+      - apt-get update -y && apt-get install -y unzip wget jq
+      - echo "Installing dotnet-sonarscanner..."
+      - dotnet tool install --global dotnet-sonarscanner || echo "Already installed"
+      - export PATH="$PATH:/root/.dotnet/tools"
+      - echo "Logging in to Amazon ECR..."
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+
+  pre_build:
+    commands:
+      - echo "Setting version tag..."
+      - VERSION_TAG=v$CODEBUILD_BUILD_NUMBER
+      - export VERSION_TAG
+      - echo "Version tag is $VERSION_TAG"
+
+  build:
+    commands:
+      - echo "Starting SonarQube analysis for backend..."
+      - cd Products_Backend
+      - dotnet sonarscanner begin /k:"Dotnet" /d:sonar.host.url="$SONAR_HOST_URL" /d:sonar.login="$SONAR_TOKEN"
+      - dotnet build
+      - dotnet sonarscanner end /d:sonar.login="$SONAR_TOKEN"
+      - cd ..
+
+      - echo "Building backend Docker image..."
+      - cd Products_Backend
+      - docker build -t $BACKEND_IMAGE_NAME:$VERSION_TAG .
+      - docker tag $BACKEND_IMAGE_NAME:$VERSION_TAG $ECR_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$BACKEND_IMAGE_NAME:$VERSION_TAG
+      - cd ..
+
+  post_build:
+    commands:
+      - echo "Pushing backend image to ECR..."
+      - docker push $ECR_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$BACKEND_IMAGE_NAME:$VERSION_TAG
+
+      - echo "Copying Kubernetes manifests..."
+      - cp cloudformation_deploy/backend-deployment.yaml .
+      - cp cloudformation_deploy/frontend-deployment.yaml || echo "frontend-deployment.yaml not needed"
+      - cp cloudformation_deploy/ingress.yaml . || echo "ingress.yaml already present"
+
+      - echo "Final workspace contents:"
+      - ls -lh
+
+artifacts:
+  files:
+    - backend-deployment.yaml
+    - frontend-deployment.yaml
+    - ingress.yaml
