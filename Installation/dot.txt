@@ -4,7 +4,7 @@ sudo apt-get update && \
 dotnet tool install --global dotnet-ef
 echo 'export PATH="$PATH:/home/ubuntu/.dotnet/tools"' >> ~/.bashrc
 source ~/.bashrc
-
+export ConnectionStrings__DefaultConnection="Server=sqlserver-instance.cziocmm4ith3.us-east-2.rds.amazonaws.com,1433;Database=ProductsDb;User Id=admin;Password=adminadmin;TrustServerCertificate=True;MultipleActiveResultSets=true"
 dotnet restore
 dotnet build
 dotnet ef migrations add Init
