@@ -44,9 +44,9 @@ phases:
       - echo "Pushing frontend to ECR..."
       - docker push $ECR_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$FRONTEND_IMAGE_NAME:$VERSION_TAG
       - echo "Copying Kubernetes manifests to workspace root..."
-      - cp Products_Backend/terraform-backend-deployment.yaml . || echo "terraform-backend-deployment.yaml not found"
-      - cp Products_UI/terraform-frontend-deployment.yaml . || echo "terraform-frontend-deployment.yaml not found"
-      - cp ingress.yaml . || echo "ingress.yaml not found or already present"
+      - cp terraform_deploy/terraform-backend-deployment.yaml . || echo "terraform-backend-deployment.yaml not found"
+      - cp terraform_deploy/terraform-frontend-deployment.yaml . || echo "terraform-frontend-deployment.yaml not found"
+      - cp terraform_deploy/ingress.yaml . || echo "ingress.yaml not found or already present"
       - echo "Final workspace contents:"
       - ls -lh
 
