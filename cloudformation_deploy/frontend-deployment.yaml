@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: product-frontend
-          image: 156041402660.dkr.ecr.us-east-1.amazonaws.com/product-frontend:v4
+          image: 156041402660.dkr.ecr.us-east-1.amazonaws.com/product-frontend:v19
           ports:
             - containerPort: 8080
           env:
