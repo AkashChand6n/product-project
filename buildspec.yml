@@ -11,6 +11,8 @@ env:
 
 phases:
   install:
+    runtime-versions:
+      dotnet: 8.0   # ✅ Add this line to ensure .NET 8 SDK is used
     commands:
       - echo "Starting install phase..."
       - set -e
@@ -58,9 +60,9 @@ phases:
       - docker push $ECR_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$FRONTEND_IMAGE_NAME:$VERSION_TAG
 
       - echo "Copying Kubernetes manifests to workspace root..."
-      - cp cloudformation_deploy/backend-deployment.yaml .
-      - cp cloudformation_deploy/frontend-deployment.yaml .
-      - cp cloudformation_deploy/ingress.yaml . || echo "ingress.yaml already in root, skipping copy"
+      - cp cloudformation_deploy/backend-deployment.yaml . || echo "Missing backend-deployment.yaml"
+      - cp cloudformation_deploy/frontend-deployment.yaml . || echo "Missing frontend-deployment.yaml"
+      - cp cloudformation_deploy/ingress.yaml . || echo "ingress.yaml already in root or missing, skipping copy"
 
       - echo "Final workspace contents:"
       - ls -lh
