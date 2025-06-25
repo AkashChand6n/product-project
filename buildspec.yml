@@ -12,6 +12,8 @@ phases:
     commands:
       - echo "Starting install phase..."
       - set -e
+      - echo Logging in to Docker Hub...
+      - echo $DOCKER_HUB_PASSWORD | docker login --username $DOCKER_HUB_USERNAME --password-stdin
       - if command -v yum >/dev/null 2>&1; then yum install -y jq; fi
       - if command -v apt-get >/dev/null 2>&1; then apt-get update && apt-get install -y jq; fi
       - echo "Logging in to ECR..."
