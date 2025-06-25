@@ -55,6 +55,12 @@ metadata:
   uid: bbab7a96-c8ed-458c-aab8-57fe1974462d
 
 
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+
+sudo mv /tmp/eksctl /usr/local/bin
+eksctl version
+
+
 eksctl utils associate-iam-oidc-provider   --cluster my-cluster   --approve
 curl -o iam-policy.json   https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.1/docs/install/iam_policy.json
 aws iam create-policy   --policy-name AWSLoadBalancerControllerIAMPolicy   --policy-document file://iam-policy.json
