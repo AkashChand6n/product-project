@@ -1,0 +1,28 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - echo Installing AWS CLI...
+      - pip install --upgrade awscli
+  pre_build:
+    commands:
+      - echo Validating CloudFormation template...
+      - aws cloudformation validate-template --template-body file://Infrastructure/cloudfrmation/final-infra.yaml
+  build:
+    commands:
+      - echo Deploying CloudFormation stack...
+      - aws cloudformation deploy \
+          --template-file Infrastructure/cloudfrmation/final-infra.yaml \
+          --stack-name my-cfn-stack \
+          --capabilities CAPABILITY_NAMED_IAM \
+          --region us-east-1
+  post_build:
+    commands:
+      - echo CloudFormation stack deployment complete.
+
+artifacts:
+  files:
+    - Infrastructure/cloudfrmation/final-infra.yaml
