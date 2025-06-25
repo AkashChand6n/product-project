@@ -16,12 +16,12 @@ spec:
     spec:
       containers:
         - name: product-backend
-          image: 715841362372.dkr.ecr.us-east-1.amazonaws.com/product-backend:v21
+          image: 156041402660.dkr.ecr.us-east-1.amazonaws.com/product-backend:v4
           ports:
             - containerPort: 7001
           env:
             - name: ConnectionStrings__DefaultConnection
-              value: "Server=dotnet.c3ayu4amyt4v.us-east-1.rds.amazonaws.com,1433;Database=ProductsDb;User Id=admin;Password=adminadmin;TrustServerCertificate=True;MultipleActiveResultSets=true"
+              value: "Server=dotnetdb-cloudformation.chmewass6qvh.us-east-1.rds.amazonaws.com;User Id=admin;Password=adminadmin;TrustServerCertificate=True;MultipleActiveResultSets=true"
             - name: Frontend__Origins
               value: "http://localhost:8080;http://product-frontend-service:8080"
 ---
