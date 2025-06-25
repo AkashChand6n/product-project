@@ -6,6 +6,8 @@ env:
     ECR_ACCOUNT_ID: 156041402660
     BACKEND_IMAGE_NAME: product-backend
     FRONTEND_IMAGE_NAME: product-frontend
+    SONAR_HOST_URL: http://44.204.129.61
+    SONAR_TOKEN: sqp_c83454a4a6dc236ca147d7e3203a22eb55daa5dc
 
 phases:
   install:
@@ -18,6 +20,9 @@ phases:
       - echo $DOCKER_HUB_PASSWORD | docker login --username $DOCKER_HUB_USERNAME --password-stdin
       - echo "Logging in to ECR..."
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - echo "Installing SonarScanner for .NET..."
+      - dotnet tool install --global dotnet-sonarscanner
+      - export PATH="$PATH:/root/.dotnet/tools"
 
   pre_build:
     commands:
@@ -28,8 +33,12 @@ phases:
 
   build:
     commands:
-      - echo "Building backend image..."
+      - echo "Running SonarQube scan..."
       - cd Products_Backend
+      - dotnet sonarscanner begin /k:"Dotnet" /d:sonar.host.url="$SONAR_HOST_URL" /d:sonar.login="$SONAR_TOKEN"
+      - dotnet build
+      - dotnet sonarscanner end /d:sonar.login="$SONAR_TOKEN"
+      - echo "Building backend image..."
       - docker build -t $BACKEND_IMAGE_NAME:$VERSION_TAG .
       - docker tag $BACKEND_IMAGE_NAME:$VERSION_TAG $ECR_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$BACKEND_IMAGE_NAME:$VERSION_TAG
       - cd ..
